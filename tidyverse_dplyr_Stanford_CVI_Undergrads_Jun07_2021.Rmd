@@ -1,0 +1,320 @@
+---
+title: "tidyverse_dplyr"
+author: "Binglan Li (binglan@stanford.edu)"
+date: "5/27/2021"
+output: html_document
+---
+The teaching material of this workshop is modified from https://seandavi.github.io/ITR/dplyr_intro_msleep.html.
+
+## Introduction
+In this workshop, we'll teach data manipulation using R and put the lecture to use with practices.
+
+
+### learning goals
+* Learning dplyr as an convenient alternative approach to manipulating data in data.frames.
+* List the commonly used dplyr functions for data manipulation, such as data frame selecting (columns), filtering (on rows), summarizing, aggregating, etc.
+* Know what the piping operator, %>%, is and how it can be used.
+
+If you have a package installed, you can call **help()** on any of its functions to get any documentation associated with them. If that documentation isn't useful, try looking at online documentation: 
+
+  * https://ggplot2.tidyverse.org/
+
+  * https://dplyr.tidyverse.org/
+
+Functions that will prove useful:
+
+**base R **
+
+  * summary()
+  * class()
+  
+**tidyverse/dplyr**
+
+  * group_by()
+  * mutate()
+  * filter()
+  * %>% 
+  * arrange()
+  * ifelse()
+  * case_when()
+  
+## Getting started
+
+Packages you should be sure to install using **install.packages()**:
+
+  * tidyverse
+
+```{r load libraries}
+library(tidyverse)
+
+# alternatively, you can uncomment the following line
+# this commond line asks R to download the tidyverse package if the package is not installed already
+#if(!library(tidyverse, quietly=T)){install.packages('tidyverse',repos="http://cran.us.r-project.org"); require(optparse, quietly=T);}
+```
+
+
+### The dataset
+
+The data we'll be using are from mammals sleep dataset. Updated sleep times and weights were taken from V. M. Savage and G. B. West. A quantitative, theoretical framework for understanding mammalian sleep (https://www.pnas.org/content/104/3/1051).
+
+```{r load dataset}
+# load the msleep dataset
+data(msleep)
+
+# lucky for us, as msleep is a default dataset that comes with dplyr, we can simply use the help function to retrieve the data description
+?msleep
+```
+
+
+It is always a good practice in data analysis to inspect and get to know your dataset. Can you tell:
+- the data type of the msleep dataset?
+- the dimension of the data?
+- the data type of each column?
+- the null-like values, NA or NULL?
+- (optional) the distribution of the data?
+
+```{r}
+# understand the data type of the msleep dataset
+# you can tell it's a tibble data frame. It's just a special type of data frame that tidyverse creates for fast, convenient data manipulation.
+class(msleep)
+
+# dimension and structure of the data frame
+dim(msleep)
+str(msleep)
+View(msleep)
+
+# printing the names of the columns & first few rows of the dataset
+colnames(msleep)
+head(msleep)
+
+# Get quartiles for 3 variables
+summary(msleep$sleep_total)
+summary(msleep$sleep_rem)
+summary(msleep$sleep_cycle)
+```
+
+
+Tips:
+- You can access one variable in a data frame using **$**.
+- Use `Tab` for auto-completion of directory locations, commands, variables, data frame column names, etc.
+
+
+As you can tell, there are many ways to primitively inspect a dataset. However you do it is up to your own preference. But it's always a good idea to understand your data.
+
+
+## Selecting columns: `select()`
+
+**Select a set** of columns such as the `name` and the `sleep_total` columns.
+
+```{r}
+sleepData <- select(msleep, name, sleep_total)
+head(sleepData)
+```
+
+
+What if you are interested in all columns except one, let's say the genus of the mammals?
+
+To **select all the columns except** a specific column, use the “-” operator (also known as negative indexing). For example, to select all columns except `genus`:
+
+```{r}
+head(select(msleep, -genus))
+```
+
+
+To **select a range of columns by name**, use the “:” operator. Note that dplyr allows us to use the column names without quotes and as “indices” of the columns.
+
+```{r}
+head(select(msleep, name:order))
+
+# if you are interested in the name and sleep data, which is to say a column AND a range of columns, you can do so by:
+head(select(msleep, c(name, sleep_total:bodywt)))
+```
+
+
+To select all columns that start with the character string “sl”, use the function starts_with().
+
+```{r}
+head(select(msleep, starts_with("sl")))
+```
+
+Some additional options to select columns based on a specific criteria include:
+
+1. `ends_with()` = Select columns that end with a character string
+2. `contains()` = Select columns that contain a character string
+3. `matches()` = Select columns that match a regular expression
+4. `one_of()` = Select column names that are from a group of names
+
+
+## Selecting rows: `filter()`
+
+One thing to remember is that the `filter()` function operates on **rows** of a data frame. It will filter and include only those rows that *match* the filtering expression. For example, we can filter the rows for mammals that sleep a total of more than 16 hours. 
+
+```{r}
+filter(msleep, sleep_total >= 16)
+```
+
+Filter the rows for mammals that sleep a total of more than 16 hours *and* have a body weight of greater than 1 kilogram.
+
+```{r}
+filter(msleep, sleep_total >= 16, bodywt >= 1)
+
+# an alternative expression
+filter(msleep, sleep_total >= 16 & bodywt >= 1)
+```
+
+Filter the rows for mammals in the Perissodactyla and Primates taxonomic order. The `%in%` operator is a logical operator that returns `TRUE` for values of a vector that are present *in* a second vector.
+
+```{r}
+filter(msleep, order %in% c("Perissodactyla", "Primates"))
+
+# what if you want any mammals except those in the Perissodactyla and Primates taxonomic orders?
+filter(msleep, !(order %in% c("Perissodactyla", "Primates")))
+```
+
+
+There are many functions and operators that comes handy when you construct the expressions used to filter the data:
+
+1. `==`, `>`, `>=`, `<`, `<=`, `!=`, `in%`
+2. `&`, `|`, `!`, `xor()`
+3. `is.na()`
+4. `between()`, `near()`
+
+## "Piping"" with `%>%`
+
+It is not unusual to want to perform a set of operations using dplyr. 
+
+The pipe operator `%>%` allows us to"pipe" the output from one function into the input of the next. While there is nothing special about how R treats operations that are written in a pipe, the idea of piping is to allow us to read multiple functions operating one after another from left-to-right. With piping, one is able to 1) save multiple steps of functions as one command and then pass that variable along the chain or 2) avoid "nest" functions and achieve reader-friendly coding. 
+
+Here's an example we have already used:
+
+```{r}
+head(select(msleep, name, sleep_total))
+```
+
+Now in this case, we will pipe the msleep data frame to the function that will select two columns (`name` and `sleep\_total`) and then pipe the new data frame to the function `head()`, which will return the head of the new data frame. 
+
+```{r}
+msleep %>% 
+    select(name, sleep_total) %>% 
+    head()
+```
+
+Which example do you think think is easier to understand, the first one with the nested functions or the second one with pipe operators?
+
+Shortcut of the pipe operator:
+- on Mac, `shift` + `cmd` + `M`
+- on PC, `shift` + `ctrl` + `M`
+
+Now that you know about the pipe operator (%>%), we will use it throughout the rest of this tutorial. 
+
+
+### Arrange Or Re-order Rows Using `arrange()`
+
+To arrange (or re-order) rows by a particular column, such as the taxonomic order, list the name of the column you want to arrange the rows by:
+
+```{r}
+msleep %>% arrange(order) %>% head()
+```
+
+Now we will select three columns from msleep, arrange the rows by the taxonomic order and then arrange the rows by sleep\_total. Finally, show the head of the final data frame:
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, sleep_total) %>% 
+    head()
+```
+
+Same as above, except here we filter the rows for mammals that sleep for 16 or more hours, instead of showing the head of the final data frame:
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, sleep_total) %>% 
+    filter(sleep_total >= 16)
+```
+
+For something slightly more complicated do the same as above, except arrange the rows in the sleep\_total column in a descending order. For this, use the function `desc()`
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, desc(sleep_total)) %>% 
+    filter(sleep_total >= 16)
+```
+
+
+## Create New Columns Using `mutate()`
+
+The `mutate()` function will add new columns to the data frame. Create a new column called rem_proportion, which is the ratio of rem sleep to total amount of sleep. 
+
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total) %>%
+    head()
+```
+
+You can add many new columns using mutate (separated by commas). Here we add a second column called bodywt_grams which is the bodywt column in grams. 
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total, 
+           bodywt_grams = bodywt * 1000) %>%
+    head()
+```
+
+Is there a relationship between `rem_proportion` and `bodywt`? How about `sleep_total`?
+
+
+## Create summaries: `summarise()`
+
+The `summarise()` function will create summary statistics for a given column in the data frame such as finding the mean. For example, to compute the average number of hours of sleep, apply the `mean()` function to the column sleep\_total and call the summary value avg\_sleep. 
+
+```{r}
+msleep %>% 
+    summarise(avg_sleep = mean(sleep_total))
+```
+
+There are many other summary statistics you could consider such `sd()`, `min()`, `max()`, `median()`, `sum()`, `n()` (returns the length of vector), `first()` (returns first value in vector), `last()` (returns last value in vector) and `n_distinct()` (number of distinct values in vector). 
+
+```{r}
+msleep %>% 
+    summarise(avg_sleep = mean(sleep_total), 
+              min_sleep = min(sleep_total),
+              max_sleep = max(sleep_total),
+              total = n())
+```
+
+Useful functions
+- Center: `mean()`, `median()`
+- Spread: `sd()`, `IQR()`, `mad()`
+- Range: `min()`, m`ax()`, `quantile()`
+- Position: `first()`, `last()`, `nth()`,
+- Count: `n()`, `n_distinct()`
+- Logical: `any()`, `all()`
+
+
+## Grouping data: `group_by()`
+
+The `group_by()` verb is an important function in dplyr. As we mentioned before it's related to concept of "split-apply-combine". We literally want to split the data frame by some variable (e.g. taxonomic order), apply a function to the individual data frames and then combine the output.
+
+Let's do that: split the msleep data frame by the taxonomic order, then ask for the same summary statistics as above. We expect a set of summary statistics for each taxonomic order.
+
+```{r}
+msleep %>% 
+    group_by(order) %>%
+    summarise(avg_sleep = mean(sleep_total), 
+              min_sleep = min(sleep_total), 
+              max_sleep = max(sleep_total),
+              total = n())
+```
+
+
+
+
+
+
+
+
+
