@@ -1,10 +1,12 @@
 ---
 title: "tidyverse_dplyr"
 author: "Binglan Li (binglan@stanford.edu)"
-date: "5/27/2021"
+date: "06/07/2021"
 output: html_document
 ---
 The teaching material of this workshop is modified from https://seandavi.github.io/ITR/dplyr_intro_msleep.html.
+
+For review of R data types, please go to this online web-based tutorial (https://www.tutorialspoint.com/r/r_data_types.htm).
 
 ## Introduction
 In this workshop, we'll teach data manipulation using R and put the lecture to use with practices.
@@ -67,11 +69,11 @@ data(msleep)
 
 
 It is always a good practice in data analysis to inspect and get to know your dataset. Can you tell:
-- the data type of the msleep dataset?
-- the dimension of the data?
-- the data type of each column?
-- the null-like values, NA or NULL?
-- (optional) the distribution of the data?
+1. the data type of the msleep dataset?
+2. the dimension of the data?
+3. the data type of each column?
+4. the null-like values, NA or NULL?
+5. (optional) the distribution of the data?
 
 ```{r}
 # understand the data type of the msleep dataset
@@ -95,8 +97,8 @@ summary(msleep$sleep_cycle)
 
 
 Tips:
-- You can access one variable in a data frame using **$**.
-- Use `Tab` for auto-completion of directory locations, commands, variables, data frame column names, etc.
+1. You can access one variable in a data frame using **$**.
+2. Use `Tab` for auto-completion of directory locations, commands, variables, data frame column names, etc.
 
 
 As you can tell, there are many ways to primitively inspect a dataset. However you do it is up to your own preference. But it's always a good idea to understand your data.
@@ -202,8 +204,8 @@ msleep %>%
 Which example do you think think is easier to understand, the first one with the nested functions or the second one with pipe operators?
 
 Shortcut of the pipe operator:
-- on Mac, `shift` + `cmd` + `M`
-- on PC, `shift` + `ctrl` + `M`
+1. on Mac, `shift` + `cmd` + `M`
+2. on PC, `shift` + `ctrl` + `M`
 
 Now that you know about the pipe operator (%>%), we will use it throughout the rest of this tutorial. 
 
@@ -287,12 +289,12 @@ msleep %>%
 ```
 
 Useful functions
-- Center: `mean()`, `median()`
-- Spread: `sd()`, `IQR()`, `mad()`
-- Range: `min()`, m`ax()`, `quantile()`
-- Position: `first()`, `last()`, `nth()`,
-- Count: `n()`, `n_distinct()`
-- Logical: `any()`, `all()`
+1. Center: `mean()`, `median()`
+2. Spread: `sd()`, `IQR()`, `mad()`
+3. Range: `min()`, m`ax()`, `quantile()`
+4. Position: `first()`, `last()`, `nth()`,
+5. Count: `n()`, `n_distinct()`
+6. Logical: `any()`, `all()`
 
 
 ## Grouping data: `group_by()`
