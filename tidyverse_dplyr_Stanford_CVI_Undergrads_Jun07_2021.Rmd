@@ -1,12 +1,13 @@
 ---
-title: "tidyverse_dplyr"
+title: "Tidyverse (dplyr)"
 author: "Binglan Li (binglan@stanford.edu)"
 date: "06/07/2021"
 output: html_document
 ---
+
 The teaching material of this workshop is modified from https://seandavi.github.io/ITR/dplyr_intro_msleep.html.
 
-For review of R data types, please go to this online web-based tutorial (https://www.tutorialspoint.com/r/r_data_types.htm).
+For review of R-object types, please go to this online web-based tutorial (https://www.tutorialspoint.com/r/r_data_types.htm).
 
 ## Introduction
 In this workshop, we'll teach data manipulation using R and put the lecture to use with practices.
@@ -37,7 +38,8 @@ Functions that will prove useful:
   * filter()
   * %>% 
   * arrange()
-  * ifelse()
+  * summarise()
+  * if_else()
   * case_when()
   
 ## Getting started
@@ -69,14 +71,16 @@ data(msleep)
 
 
 It is always a good practice in data analysis to inspect and get to know your dataset. Can you tell:
-1. the data type of the msleep dataset?
+
+1. the R-object type of the msleep dataset?
 2. the dimension of the data?
 3. the data type of each column?
 4. the null-like values, NA or NULL?
 5. (optional) the distribution of the data?
 
+
 ```{r}
-# understand the data type of the msleep dataset
+# understand the R-object type of the msleep dataset
 # you can tell it's a tibble data frame. It's just a special type of data frame that tidyverse creates for fast, convenient data manipulation.
 class(msleep)
 
@@ -97,11 +101,15 @@ summary(msleep$sleep_cycle)
 
 
 Tips:
+
 1. You can access one variable in a data frame using **$**.
 2. Use `Tab` for auto-completion of directory locations, commands, variables, data frame column names, etc.
 
 
 As you can tell, there are many ways to primitively inspect a dataset. However you do it is up to your own preference. But it's always a good idea to understand your data.
+
+
+So, can you answer the questions: 1) What is the R-object type of the msleep dataset? 2) What is the dimension of the data? 3) What is the data type of each column? 4) What is the null-like values, NA or NULL? 5) (Optional) the distribution of the data?
 
 
 ## Selecting columns: `select()`
@@ -204,6 +212,7 @@ msleep %>%
 Which example do you think think is easier to understand, the first one with the nested functions or the second one with pipe operators?
 
 Shortcut of the pipe operator:
+
 1. on Mac, `shift` + `cmd` + `M`
 2. on PC, `shift` + `ctrl` + `M`
 
@@ -313,10 +322,38 @@ msleep %>%
 ```
 
 
+## (Optional) conditional manipulation ]: `if_else()` & `case_when()`
+
+This is a more advanced topic. What if you need to do conditional manipulation of the data
+
+```{r}
+msleep %>% 
+  mutate(long_sleep = if_else(sleep_total >=16, 'Yes', 'No')) %>%
+  head()
+```
 
 
+What if there are missing values in the `sleep_total` column.
+
+```{r}
+msleep %>% 
+  mutate(long_sleep = if_else(sleep_total >=16, 'Yes', 'No', missing = NULL)) %>%
+  head()
+```
 
 
+While `if_else()` only returns binary results based on the condition, You can use `case_when()` to vectorise multiple `if_else()` statements.
 
+```{r}
+msleep %>% 
+  mutate(random_comments = case_when(
+  sleep_total < 2 ~ "don't you sleep?",
+  between(sleep_total, 6, 8) ~ "good",
+  between(sleep_total, 8, 16) ~ "I envy you",
+  sleep_total >= 19 ~ "you sleep the whole day?",
+  TRUE ~ "I don't know what labels to put"
+  )) %>%
+  select(name,random_comments) %>%
+  head()
 
-
+```
