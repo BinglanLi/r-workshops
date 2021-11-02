@@ -1,0 +1,866 @@
+---
+title: "Getting Started with R"
+author: "Binglan Li (binglan@stanford.edu)"
+date: "11/03/2021"
+output: html_document
+---
+
+The teaching material of this workshop is adapted from https://seandavi.github.io/ITR/index.html.
+
+
+## Learning objectives
+
+- Be able to start R and RStudio
+- Learn to interact with the R console
+- Know the difference between expressions and assignment
+- Recognize valid and invalid R names
+- Know how to access the R help system
+- Know how to assign values to variables, find what is in R memory, and remove values from R memory
+- Understand data types and R-object types
+- Read a file
+- Operators
+- Install and load a library
+- Save RData or write to files
+- Control structures and looping
+- Know how to write a function
+- Use R's default plotting functions
+- Ready for more advanced topics, e.g., data manipulation and data visualization
+
+
+## Starting R
+
+How to start R depends a bit on the operating system (Mac, Windows,
+Linux) and interface.  In this course, we will largely be using an
+Integrated Development Environment (IDE) called *RStudio*, but there
+is nothing to prohibit using R at the command line or in some other
+interface (and there are a few).
+
+## _RStudio_: A Quick Tour
+
+
+The RStudio interface has multiple panes. All of these panes are
+simply for convenience except the "Console" panel, typically in the
+lower left corner (by default). The console pane contains the running R
+interface. If you choose to run R outside RStudio, the interaction
+will be *identical* to working in the console pane. This is useful to
+keep in mind as some environments, such as a computer cluster,
+encourage using R without RStudio.
+
+- Panes
+- Options
+- Help
+- Environment, History, and Files
+
+### Helpful functions or features in Rstudio
+
+  1. Auto-filling using the `Tab` key. 
+
+```{r helpful function, eval=FALSE, include=FALSE}
+# automatic filling
+# try to find the mean() function, which calculates the mean of input vectors, using the 'tab' key immediate following 'me'
+me
+```
+
+ 
+  2. **Command + Enter** in Mac and **Control + Enter** in Windows to execute the line of source code where the cursor currently resides
+
+```{r helpful function, echo=TRUE}
+# try to execute the following code with the shortcut
+mean(c(1,2,3))
+```
+
+
+## Interacting with R
+
+
+The only meaningful way of interacting with R is by typing into the R console. At the most basic level, anything that we type at the command line will fall into one of two categories:
+
+1. Assignments
+    
+```{r}
+x = 1
+y <- 2
+```
+    
+2. Expressions
+
+```{r}
+1 + pi + sin(42)
+```
+
+The assignment type is obvious because either the The `<-` or `=` are used. Note that when we type expressions, R will return a result.  In this case, the result of R evaluating `1 + pi + sin(42)` is `r 1 + pi + sin(42)`.
+
+The standard R prompt is a ">" sign. When present, R is waiting for the next expression or assignment.  If a line is not a complete R command, R will continue the next line with a "+". For example, typing the fillowing with a "Return" after the second "+" will result in R giving back a "+" on the next line, a prompt to keep typing.
+
+```{r tidy=FALSE}
+1 + pi +
+sin(3.7)
+```
+
+R can be used as a glorified calculator by using R expressions. Mathematical operations include:
+
+- Addition: `+`
+- Subtraction: `-`
+- Multiplication: `*`
+- Division: `/`
+- Exponentiation: `^`
+- Modulo: `%%`
+
+The `^` operator raises the number to its left to the power of the number to its right: for example `3^2` is `9`.
+The modulo returns the remainder of the division of the number to the left by the number on its right, for example 5 modulo 3 or `5 %% 3` is 2.
+
+### Expressions
+
+```{r calculator10, eval=FALSE}
+5 + 2
+28 %% 3
+3^2
+5 + 4 * 4 + 4 ^ 4 / 10
+```
+
+Note that R follows order-of-operations and groupings based on parentheses.
+
+```{r calculator20, eval=FALSE}
+5 + 4 / 9
+(5 + 4) / 9
+```
+
+### Assignment
+
+While using R as a calculator is interesting, to do useful and interesting things, we need to assign _values_ to _objects_. To create objects, we need to give it a name followed by the assignment operator `<-` (or, entirely equivalently, `=`) and the value we want to give it:
+
+```{r assignment}
+weight_kg <- 55 
+```
+
+`<-` is the assignment operator. Assigns values on the right to objects on the left, it is like an arrow that points from the value to the object. Using an `=` is equivalent (in nearly all cases). Learn to use `<-` as it is good programming practice. 
+
+Objects can be given any name such as `x`, `current_temperature`, or `subject_id` (see below). You want your object names to be explicit and not too long. They cannot start with a number (`2x` is not valid but `x2` is). R is case sensitive (e.g., `weight_kg` is different from `Weight_kg`). There are some names that cannot be used because they represent the names of fundamental functions in R (e.g., `if`, `else`, `for`, see [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html) for a complete list). In general, even if it's allowed, it's best to not use other function names, which we'll get into shortly (e.g., `c`, `T`, `mean`, `data`, `df`, `weights`). When in doubt, check the help to see if the name is already in use. It's also best to avoid dots (`.`) within a variable name as in `my.dataset`. It is also recommended to use nouns for variable names, and verbs for function names.
+
+When assigning a value to an object, R does not print anything. You can force to print the value by typing the name:
+
+```{r printAssignment}
+weight_kg
+```
+
+Now that R has `weight_kg` in memory, which R refers to as the "global environment", we can do arithmetic with it. For instance, we may want to convert this weight in pounds (weight in pounds is 2.2 times the weight in kg).
+
+```{r modAssignment}
+2.2 * weight_kg
+```
+
+We can also change a variable's value by assigning it a new one:
+
+```{r newAssignment}
+weight_kg <- 57.5
+2.2 * weight_kg
+```
+
+This means that assigning a value to one variable does not change the values of other variables. For example, let's store the animal's weight in pounds in a variable.
+
+```{r calculationWithVar}
+weight_lb <- 2.2 * weight_kg
+```
+
+and then change `weight_kg` to 100.
+
+```{r modAssignment2}
+weight_kg <- 100
+```
+
+What do you think is the current content of the object `weight_lb`, 126.5 or 220?
+
+You can see what objects (variables) are stored by viewing the Environment tab in Rstudio. You can also use the `ls()` function. You can remove objects (variables) with the `rm()` function. You can do this one at a time or remove several objects at once. You can also use the little broom button in your environment pane to remove everything from your environment.
+
+```{r rm, eval=FALSE}
+ls()
+rm(weight_lb, weight_kg)
+ls()
+```
+
+What happens when you type the following, now?
+
+```{r errorAfterrm, eval=FALSE}
+weight_lb # oops! you should get an error because weight_lb no longer exists!
+```
+
+## Rules for Names in R
+
+R allows users to assign names to objects such as variables, functions, and even dimensions of data. However, these names must follow a few rules.
+
+- Names may contain any combination of letters, numbers, underscore, and "."
+- Names may not start with numbers, underscore.
+- R names are case-sensitive.
+
+Examples of valid R names include:
+
+```
+pi
+x
+camelCaps
+my_stuff
+MY_Stuff
+this.is.the.name.of.the.man
+ABC123
+abc1234asdf
+.hi
+```
+
+## Resources for Getting Help
+
+There is extensive built-in help and documentation within R. A separate page contains a collection of  [additional resources](further_resources.html).
+
+If the name of the function or object on which help is sought is known, the following approaches with the name of the function or object will be helpful. For a concrete example, examine the help for the `print` method.
+
+```{r eval=FALSE}
+help(print)
+help('print')
+?print
+```
+
+If the name of the function or object on which help is sought is *not* known, the following from within R will be helpful. 
+
+```{r eval=FALSE}
+help.search('microarray')
+RSiteSearch('microarray')
+apropos('histogram')
+```
+
+There are also tons of online resources that Google will include in searches if online searching feels more appropriate.
+
+I strongly recommend using `help("newfunction")` for all
+functions that are new or unfamiliar to you.
+
+
+## Exercises
+
+- Without using R, what are the values of the following?
+
+```r
+mass <- 50              # mass?
+age  <- 30              # age?
+mass <- mass * 2        # mass?
+age  <- age - 10        # age?
+mass_index <- mass/age  # massIndex?
+```
+
+- Use the R `help()` function to find information about the "hist" function. Follow up with running the example using `example("hist")`.
+
+- Which of these is a valid R name for a variable?
+
+```r
+x2
+2x
+.abc
+abc.123
+.123
+_my_value
+my_value
+my.value
+```
+
+
+##########################################################################
+
+## Break
+
+##########################################################################
+
+Now that we know how to assign values to a variable. Let's learn about what different types of values/data R operates on.
+
+## data type
+
+Data types are the types of value that is acceptable by R and the basis of any programming language. 
+
+Based on the data type of a variable, the operating system allocates memory and decides what can be stored in the reserved memory. In other words, if we consider programming as cooking, data types are the basic ingredients based on which we can use to create a dish. Because of this reason, data types should cover as many different types of data as possible to allow programming for different purposes. 
+
+Table: (\#tab:simpletypes) Atomic (simplest) data types in R.
+
+  Data type   Stores
+  ----------- ------------------------
+    numeric      floating point numbers
+    integer           integers
+    complex       complex numbers
+    factor        categorical data
+   character          strings
+    logical        TRUE or FALSE
+      NA              missing
+     NULL              empty
+   function        function type
+
+
+## R-object type
+
+The variables are assigned with R-Objects and the data type of the R-object becomes the data type of the variable. There are many types of R-objects. The frequently used ones are −
+
+1. Vectors *
+2. Lists *
+3. Matrices *
+4. Arrays
+5. Factors
+6. Data Frames *
+
+## Vectors
+
+Vectors can only contain elements of the same type (AKA atomic vectors). 
+
+To building a vector, use the "concatenate" or "combine" function `c()`.
+
+``` {r eval = TRUE}
+vector1 <- c(1, 5, 8.4, -6, 2)                  #Numeric
+vector2 <- c(TRUE, TRUE, FALSE, NA, FALSE)      #Logical
+vector3 <- c("first", "second", "third", "fourth", "fifth")        #Character
+
+# create a sequence by concatenating two other sequences
+vector4 <- c("sixth", "seventh")
+vector5 <- c(vector3, vector4)
+```
+
+Vector1 contains integers and floats, but they are all considered of the numeric type by R. R typically forces integers to floats anyway.
+
+Vector3 contains what we would usually consider "strings" in C++ or Java, but R considers them all part of the character class.
+
+If you're ever unsure of what type of vector you have, use the class() function. 
+
+``` {r eval = TRUE}
+class(vector1)
+```
+
+### Accessing vector elements - Indexing
+
+Refer to element(s) of a vector using subscripts enclosed in []. NOTE: R uses 1-indexing.
+
+``` {r eval = FALSE}
+vector1[3]
+vector1[c(2,4)]
+```
+
+
+### Vector Operations
+
+Operations on a single vector are typically done element-by-element. For example, we can add `2` to a vector, `2` is added to each element of the vector and a new vector of the same length is returned.
+
+```{r}
+x <- 1:10
+x + 2
+```
+
+If the operation involves two vectors, the following rules apply. If the vectors are the same length: R simply applies the operation to each pair of elements.
+
+```{r}
+x + x
+```
+
+If the vectors are different lengths, but one length a multiple of the other, R
+reuses the shorter vector as needed.
+
+```{r}
+x <- 1:10
+y <- c(1,2)
+x * y
+```
+
+If the vectors are different lengths, but one length *not* a multiple of the
+other, R reuses the shorter vector as needed *and* delivers a
+warning.
+
+```{r}
+x <- 1:10
+y <- c(2,3,4)
+x * y
+```
+
+### Logical Operators
+
+Some operators like `<, >, ==, >=, <=, !=` can be used to create logical
+vectors.
+
+```{r}
+# create a numeric vector
+x = 1:10
+# testing whether x > 5 creates a logical vector
+x > 5
+x <= 5
+x != 5
+x == 5
+# store the logical operation output in a variable
+x_gt_5 <- (x > 5)
+x_gt_5
+class(x_gt_5)
+```
+
+
+## Lists
+
+Lists contain objects that can be of different types, even including other lists.
+
+To building a vector, use the `list()` function.
+
+``` {r eval = TRUE}
+x <- list(vector1, vector2, vector3, 8)
+x
+```
+
+Working with Lists - Slicing vs. Referencing 
+
+Slicing, [] - Retrieve a list object or "slice" of the original list
+
+Reference, [[]] - Retrieve a list element, which can them be modified directly
+
+``` {r eval = TRUE}
+slice <- x[2]        #slicing
+class(slice)
+ref <- x[[2]]      #referencing
+class(ref)
+```
+
+#Matrices
+
+Matrices are 2-dimensional (rectangular) collection of data of a single type, with all columns of equal length.
+
+Matrices can be created using the `matrix()` function or by combining two vectors of the same length. 
+
+``` {r eval = TRUE}
+x <- 1:10 
+y <- rnorm(10)
+# make a matrix by column binding two numeric vectors
+mat<-cbind(x,y)
+mat
+# inspect row and column names
+rownames(mat)
+colnames(mat)
+
+data <- c(2, 4, 3, 1, 5, 7)
+rnames <- c("row1", "row2")
+cnames <- c("col1", "col2", "col3")
+mymatrix <- matrix(data, nrow = 2, ncol = 3, byrow = FALSE, dimnames = list(rnames, cnames))
+mymatrix
+```
+
+
+Now that we have a matrix, we can index by position or name using the format `Matrix[row,col]`.
+
+``` {r eval = TRUE}
+# The 3rd element of the 2nd row of mat
+mymatrix[2,3]
+# same as above, but specifying row and column names
+mymatrix["row2", "col3"]
+# the 1st ROW
+mymatrix[1,]
+# the 2nd COLUMN
+mymatrix[,2]
+# and all elements of mat that are > 4; note no comma
+mat[mat>4]
+```
+
+Note that in the last case, there is no ",", so R treats the matrix as a long vector (length=20). This is convenient, sometimes, but it can also be a source of error, as some code may "work" but be doing something unexpected.
+
+
+#Data Frames
+
+Data frames are what makes R an useful programming language for data science. Data frames are also 2-dimensional collection of data. Unlike matrices, data frame can have columns that contain different data types.
+
+We can create a data frame using the `data.frame()` function.
+
+``` {r eval = TRUE}
+df <- data.frame(vector1, vector2, vector3)
+df
+```
+
+We will introduce more features and utilities of data frame with an actual data set later.
+
+#R Quirk: Factors
+
+Factors are a data type used to represent categorical data. They look like characters/strings but are actually stored as integers in R internal memory. They shouldn't been seen as the equivalent of strings (Ex. "Female" stored as 1, "Male" stored as 2). Factors are an advanced R-object type, which is convenient when it comes to sorting categorical data and data visualization.
+
+Bottom line: if you have a code snippet that you think should be working but isn't, check that the variable classes are what you expect.
+
+
+``` {r eval = TRUE}
+n <- c(3.4, 1.2, 5)   #numeric vector
+n
+f <- factor(n)        #converting the numbers into factors
+# f <- as.factor(n)   #you can also do the conversion using the as.factor function
+f
+as.numeric(f)         #converting the factors back to numbers
+typeof(f)             #check the data type of a variable
+```
+
+Why did this happen? R stores your data (numeric or not) as integers, regardless of the order you entered them.
+
+To see the actual data you saved as factors, use the levels() function.
+
+``` {r evl = TRUE}
+levels(f)
+```
+
+
+## Read file
+In research, data is often organized into a table of some kind, with columns corresponding to variables and rows corresponding to observations. For example, we may have a collection of demographic data (e.g. for each row, a state, its population, poverty and crime rates, land area, etc.), gene expression data (for each row, a gene ID, its genomic coordinates, and its expression across tissues), or electronic health records (you can imagine having rows for patients *or* individual hospital visits; what kinds of variables would you collect?). These data are generally stored in an external file, with a uniform delimiter separating columns, and must be loaded into R for analysis. Let's load data from the Framingham Heart Study, a study of BLANK:
+
+```{r eval=TRUE}
+fhs_data <- read.csv("Framingham.dat")
+```
+
+
+##########################################################################
+
+## Break
+## Any question so far? Can you load the Framingham Heart Study data?
+
+##########################################################################
+
+### Inspecting data.frames
+
+Our `fhs_data` variable is a data.frame. The data set is fairly large, so we will not be
+able to look at it all at once on the screen. However, R gives us many tools to inspect a data.frame.
+
+- Overviews of content
+  + `head()` to show first few rows
+  + `tail()` to show last few rows
+- Size
+  + `dim()` for dimensions (rows, columns)
+  + `nrow()`
+  + `ncol()`
+  + `object.size()` for power users interested in the memory used to store an object
+- Data and attribute summaries
+  + `colnames()` to get the names of the columns
+  + `rownames()` to get the "names" of the rows--may not be present
+  + `summary()` to get per-column summaries of the data in the data.frame.
+  + `str()` to get the structure of an R object
+  
+```{r dataframeinspection}
+head(fhs_data)
+tail(fhs_data)
+dim(fhs_data)
+nrow(fhs_data)
+ncol(fhs_data)
+colnames(fhs_data)
+summary(fhs_data)
+str(fhs_data)
+```
+
+In RStudio, there is an additional function, `View()` (note the capital "V") that opens the first
+1000 rows (default) in the RStudio window, akin to a spreadsheet view. 
+
+```{r eval=FALSE}
+View(fhs_data)
+```
+
+### More advanced indexing and subsetting
+
+We can use, for example, logical values (TRUE/FALSE) to subset data.frames.
+
+```{r}
+head(fhs_data[fhs_data$SBP >= 130, ])
+tail(fhs_data[fhs_data$SBP >= 130, ])
+
+# subset people with high blood pressure
+fhs_high_bp <- fhs_data[fhs_data$SBP >= 130 & fhs_data$DBP >= 130, ]
+```
+
+
+## save data
+
+There are two main ways to save data in R
+    1. Save an R object to file
+    2. Save one or more R objects to .RData file
+
+```{r}
+# save to file
+write.csv(fhs_high_bp, "framingham_high_blood_pressure.txt", sep = ",", quote = FALSE, col.names = TRUE, row.names = F)
+
+# save one or more object to RData
+save(fhs_high_bp, file = "framingham_high_blood_pressure.RData")
+# to load an RData file
+load("framingham_high_blood_pressure.RData")
+```
+
+
+## Load libraries
+
+R comes with various libraries. Libraries comes with functions that is written and most of the time, painstakingly tested functions. Libraries make your data analysis and coding tasks easier. 
+
+```{r}
+# for data manipulation
+# install libraries
+install.packages("dplyr")
+# load libraries
+library(dplyr)
+
+# install libraries
+install.packages("ggplot2")
+# load libraries
+library(ggplot2)
+```
+
+Both `dplyr` and `ggplot2` are parts of a larger R library called `tidyverse`, which provides a collection of R function for data science. 
+
+
+##########################################################################
+
+## Quick Break
+## Any issue with downloading and loading libraries
+
+##########################################################################
+
+## Control Structures in R
+
+R has multiple types of control structures that allows for sequential evaluation of statements.
+
+-   [For loops]{}
+
+        for (x in set) {operations}
+
+-   [while loops]{}
+
+        while (x in condition){operations}
+
+-   [If statements (conditional)]{}
+
+        if (condition) {
+            some operations 
+        } else { 
+            other operations 
+        }
+
+### Control Structure and Looping Examples
+
+```{r}
+x<-1:9
+length(x)
+
+# a simple conditional then two expressions
+if (length(x)<=10) {
+   x<-c(x,10:20);print(x)}
+
+# more complex 
+if (length(x)<5) {
+    print(x)
+} else {
+    print(x[5:20])
+}       
+
+# print the values of x, one at a time
+for (i in x) print(i) 
+for (i in x) i   # note R will not echo in a loop
+# loop over a character vector
+y<-c('a','b','hi there')            
+for (i in y){
+    print(i)
+}
+
+# and a while loop
+j<-1                
+while(j<10){ # do this while j<10      
+  print(j)
+  j<-j+2 # at each iteration, increase j by 2
+ } 
+```
+
+
+# Write a function
+
+R comes with many convenient default functions. More is provided by libraries. Yet, sometimes, you will find some repetitive data analysis tasks that you need to do but there is no available function for it. When this happens, you will need to write your own function.
+
+-   [Functions are objects and are assigned to names, just like data.]{}
+
+        myFunction <- function(argument1,argument2) {
+          expression1
+          expression2
+        }
+        
+It is wise to include a comment at the start of each function to say what it does and to document functions of more than a few lines.
+
+```{r}
+# some default R functions
+mean(fhs_data$DBP)   # mean
+median(fhs_data$DBP) # median
+min(fhs_data$DBP)    # minimum
+max(fhs_data$DBP)    # maximum
+var(fhs_data$DBP)    # variance
+sd(fhs_data$DBP)     # standard deviation
+```
+
+
+```{r}
+calc_sum_squares <- function(a_vector){
+    # this function calculates the the sum of the square of variation
+    # same as "sum( (x - mean(x) )^2 )"
+    
+    # if not a numeric vector, stop
+    if(class(a_vector) != "numeric"){
+        stop("Vector is not numeric!!!")
+    }
+    
+    # calculate the sum of the square
+    vec_mean <- mean(a_vector, na.rm = TRUE)
+    vec_ss <- sum( (a_vector - vec_mean )^2 )
+    
+    # return the sum of the square
+    vec_ss
+}
+
+calc_sum_squares(vector1)
+calc_sum_squares(vector3)
+```
+
+
+## data visualization
+
+R comes with some default plotting function, which is sufficient for preliminary data analysis. For publication-ready figures, `ggplot2()` and other libraries are recommended.
+
+```{r}
+hist(fhs_data$DBP) # histogram of the diastolic blood pressure
+hist(fhs_data$SBP) # histogram of the systolic blood pressure
+```
+
+We can also normalize these variables to have mean 0 and standard deviation 1 using `scale`:
+
+```{r}
+hist(scale(fhs_data$DBP))
+hist(scale(fhs_data$SBP))
+```
+
+```{r}
+library(tidyr)
+library(ggplot2)
+
+fhs_clean = fhs_data[complete.cases(fhs_data),] # subset 'fhs_data', including only complete rows
+
+fhs_clean %>%
+  gather(key=variable, value=value, c(AGE, SBP, DBP, CHOL, FRW)) %>%
+  ggplot(., aes(x=value)) +
+  geom_histogram() +
+  theme_classic(base_size=15) +
+  facet_wrap(~ variable, scales="free_x")
+
+# you can also save the ggplot2 object to a variable
+p_fhs <- fhs_clean %>%
+  gather(key=variable, value=value, c(AGE, SBP, DBP, CHOL, FRW)) %>%
+  ggplot(., aes(x=value)) +
+  geom_histogram() +
+  theme_classic(base_size=15) +
+  facet_wrap(~ variable, scales="free_x")
+# this ggplot2 figure can be reused
+p_fhs 
+p_fhs + labs(x = "Measures", y = "Counts")
+```
+
+
+Ways to save R figures
+    1. Save directly to files
+    2. Save figures from the `Plots` panel
+
+```{r}
+# plotting 
+plot(x = fhs_clean$DBP, y=fhs_clean$SBP)
+plot(SBP ~ DBP, fhs_clean) # this probably look better
+
+# 1.1. create a figure file and save directly to it
+png("framingham_sbp_dbp.png", res = 300)
+plot(SBP ~ DBP, fhs_clean)
+dev.off() # don't forget to close the plotting device/file
+
+
+# for ggplot2, you can use `ggsave()` directly to save a figure
+p_fhs + 
+    ggsave("framingham_sbp_dbp.tiff", dpi = 300) # figure type is indicated by file format suffix
+
+# 1.2. save using `Plots` panel
+# type the plotting command in the console, the figure will show up in the `Plots` panel
+# click `Export` to save the image
+```
+
+
+##########################################################################
+
+## Break/The end
+## More advanced topics to come
+## 1. Applying (see below)
+## 2. Data manipulation using `dplyr`
+## 3. Data visualization using `ggplot2`
+## 4. Statistical analysis using R
+## 5. Parallel computing using `doParallel` and `foreach`
+
+##########################################################################
+
+## Applying
+
+### Why Does R Have Apply Functions
+
+-   [Often we want to apply the same function to all the rows or columns
+    of a matrix, or all the elements of a list.]{}
+
+-   [We could do this in a loop, but loops take a lot of time in an
+    interpreted language like R.]{}
+
+-   [R has more efficient built-in operators, the apply functions.]{}
+
+[example]{} If mat is a matrix and fun is a function (such as mean, var,
+lm ...) that takes a vector as its argument, then you can:
+
+    apply(mat,1,fun) # over rows--second argument is 1      
+    apply(mat,2,fun) # over columns--second argument is 2
+
+In either case, the output is a *vector*.
+
+### Apply Function Exercise
+
+1.  [Using the matrix and rnorm functions, create a matrix with 20 rows
+    and 10 columns (200 values total) of random normal deviates.]{}
+
+2.  [Compute the mean for each row of the matrix.]{}
+
+3.  [Compute the median for each column.]{}
+
+### Related Apply Functions
+
+-   [`lapply(list, function)` applies the function to every element of
+    list]{}
+
+-   [`sapply(list or vector, function)` applies the function to every
+    element of list or vector, and returns a vector, when possible
+    (easier to process)]{}
+    
+-   [`vapply(list or vector, function)` applies the function to every
+    element of list or vector, and returns a vector, when possible
+    (easier to process)]{}
+
+-   [`tapply(x, factor, fun)` uses the factor to split vector x into
+    groups, and then applies fun to each group]{}
+
+
+```{r}
+    # create a list
+    my.list <- list(a=1:3,b=5:10,c=11:20)
+    my.list
+    # Get the mean for each member of the list
+    # return a vector
+    sapply( my.list, mean)
+    # Get the full summary for each member of
+    # the list, returned as a list
+    lapply( my.list, summary)
+    # Find the mean for each group defined by a factor
+    my.vector <- 1:10
+    my.factor <- factor(
+      c(1,1,1,2,2,2,3,3,3,3))
+    tapply(my.vector, my.factor, mean)
+```
+
+
+
+## Reference
+
+- [R Data Type](https://www.tutorialspoint.com/r/r_data_types.htm)
+
+#### Statistical Analysis in R
+* "An Introduction to Statistical Learning: With Applications in R" by Gareth M. James, Daniela Witten, Trevor Hastie, R J Tibshirani
+* "Applied linear statistical models" by John Neter
+
+#### Visualization in R
+* R cheat sheet [google]
+* Google ggplot2 reference to to go the following website, https://ggplot2.tidyverse.org/reference/index.html
+* Stack Overflow with keywords, “R” or “ggplot2”
+* R for Data Science available at https://r4ds.had.co.nz/
+* "The R Graphics Cookbook" by Winston Chang
