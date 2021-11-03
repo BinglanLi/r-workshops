@@ -5,7 +5,7 @@ date: "11/03/2021"
 output: html_document
 ---
 
-The teaching material of this workshop is adapted from https://seandavi.github.io/ITR/index.html.
+Part of this teaching material of this workshop is adapted from https://seandavi.github.io/ITR/index.html.
 
 
 ## Learning objectives
@@ -90,7 +90,7 @@ y <- 2
 
 The assignment type is obvious because either the The `<-` or `=` are used. Note that when we type expressions, R will return a result.  In this case, the result of R evaluating `1 + pi + sin(42)` is `r 1 + pi + sin(42)`.
 
-The standard R prompt is a ">" sign. When present, R is waiting for the next expression or assignment.  If a line is not a complete R command, R will continue the next line with a "+". For example, typing the fillowing with a "Return" after the second "+" will result in R giving back a "+" on the next line, a prompt to keep typing.
+The standard R prompt is a ">" sign. When present, R is waiting for the next expression or assignment.  If a line is not a complete R command, R will continue the next line with a "+". For example, typing the following with a "Return" after the second "+" will result in R giving back a "+" on the next line, a prompt to keep typing.
 
 ```{r tidy=FALSE}
 1 + pi +
@@ -195,7 +195,7 @@ R allows users to assign names to objects such as variables, functions, and even
 Examples of valid R names include:
 
 ```
-pi
+pi # try to avoid conflicts with default variables/function names
 x
 camelCaps
 my_stuff
@@ -314,6 +314,7 @@ vector3 <- c("first", "second", "third", "fourth", "fifth")        #Character
 # create a sequence by concatenating two other sequences
 vector4 <- c("sixth", "seventh")
 vector5 <- c(vector3, vector4)
+vector6 <- c(vector1, vector3)
 ```
 
 Vector1 contains integers and floats, but they are all considered of the numeric type by R. R typically forces integers to floats anyway.
@@ -331,6 +332,7 @@ class(vector1)
 Refer to element(s) of a vector using subscripts enclosed in []. NOTE: R uses 1-indexing.
 
 ``` {r eval = FALSE}
+vector1
 vector1[3]
 vector1[c(2,4)]
 ```
@@ -377,7 +379,7 @@ vectors.
 
 ```{r}
 # create a numeric vector
-x = 1:10
+x <- 1:10
 # testing whether x > 5 creates a logical vector
 x > 5
 x <= 5
@@ -392,7 +394,7 @@ class(x_gt_5)
 
 ## Lists
 
-Lists contain objects that can be of different types, even including other lists.
+Lists can contain R-objects that are of different types, even including other lists.
 
 To building a vector, use the `list()` function.
 
@@ -414,7 +416,8 @@ ref <- x[[2]]      #referencing
 class(ref)
 ```
 
-#Matrices
+
+## Matrices
 
 Matrices are 2-dimensional (rectangular) collection of data of a single type, with all columns of equal length.
 
@@ -424,7 +427,7 @@ Matrices can be created using the `matrix()` function or by combining two vector
 x <- 1:10 
 y <- rnorm(10)
 # make a matrix by column binding two numeric vectors
-mat<-cbind(x,y)
+mat <- cbind(x,y)
 mat
 # inspect row and column names
 rownames(mat)
@@ -445,6 +448,7 @@ Now that we have a matrix, we can index by position or name using the format `Ma
 mymatrix[2,3]
 # same as above, but specifying row and column names
 mymatrix["row2", "col3"]
+mymatrix[2, "col3"]
 # the 1st ROW
 mymatrix[1,]
 # the 2nd COLUMN
@@ -512,8 +516,7 @@ fhs_data <- read.csv("Framingham.dat")
 
 ### Inspecting data.frames
 
-Our `fhs_data` variable is a data.frame. The data set is fairly large, so we will not be
-able to look at it all at once on the screen. However, R gives us many tools to inspect a data.frame.
+Our `fhs_data` variable is a data.frame. The data set is fairly large, so we will not be able to look at it all at once on the screen. However, R gives us many tools to inspect a data.frame.
 
 - Overviews of content
   + `head()` to show first few rows
@@ -540,8 +543,7 @@ summary(fhs_data)
 str(fhs_data)
 ```
 
-In RStudio, there is an additional function, `View()` (note the capital "V") that opens the first
-1000 rows (default) in the RStudio window, akin to a spreadsheet view. 
+In RStudio, there is an additional function, `View()` (note the capital "V") that opens the first 1000 rows (default) in the RStudio window, akin to a spreadsheet view. 
 
 ```{r eval=FALSE}
 View(fhs_data)
@@ -556,7 +558,8 @@ head(fhs_data[fhs_data$SBP >= 130, ])
 tail(fhs_data[fhs_data$SBP >= 130, ])
 
 # subset people with high blood pressure
-fhs_high_bp <- fhs_data[fhs_data$SBP >= 130 & fhs_data$DBP >= 130, ]
+fhs_high_bp <- fhs_data[fhs_data$SBP >= 130 & fhs_data$DBP >= 80, ]
+fhs_high_bp
 ```
 
 
@@ -568,10 +571,10 @@ There are two main ways to save data in R
 
 ```{r}
 # save to file
-write.csv(fhs_high_bp, "framingham_high_blood_pressure.txt", sep = ",", quote = FALSE, col.names = TRUE, row.names = F)
+write.csv(fhs_high_bp, "framingham_high_blood_pressure.txt", sep = ",", quote = FALSE, col.names = TRUE, row.names = FALSE)
 
 # save one or more object to RData
-save(fhs_high_bp, file = "framingham_high_blood_pressure.RData")
+save(fhs_high_bp, fhs_data, file = "framingham_high_blood_pressure.RData")
 # to load an RData file
 load("framingham_high_blood_pressure.RData")
 ```
@@ -579,7 +582,7 @@ load("framingham_high_blood_pressure.RData")
 
 ## Load libraries
 
-R comes with various libraries. Libraries comes with functions that is written and most of the time, painstakingly tested functions. Libraries make your data analysis and coding tasks easier. 
+R comes with various libraries. Libraries comes with, most of the time, painstakingly tested functions. Libraries make your data analysis and coding tasks easier. 
 
 ```{r}
 # for data manipulation
@@ -592,6 +595,11 @@ library(dplyr)
 install.packages("ggplot2")
 # load libraries
 library(ggplot2)
+
+# install libraries
+install.packages("tidyr")
+# load libraries
+library(tidyr)
 ```
 
 Both `dplyr` and `ggplot2` are parts of a larger R library called `tidyverse`, which provides a collection of R function for data science. 
@@ -632,22 +640,24 @@ length(x)
 
 # a simple conditional then two expressions
 if (length(x)<=10) {
-   x<-c(x,10:20);print(x)}
+    x <- c(x,10:20)
+    print(x)
+}
 
 # more complex 
 if (length(x)<5) {
     print(x)
 } else {
     print(x[5:20])
-}       
+}     
 
 # print the values of x, one at a time
 for (i in x) print(i) 
 for (i in x) i   # note R will not echo in a loop
 # loop over a character vector
 y<-c('a','b','hi there')            
-for (i in y){
-    print(i)
+for (single_element in y){
+    print(single_element)
 }
 
 # and a while loop
@@ -655,7 +665,7 @@ j<-1
 while(j<10){ # do this while j<10      
   print(j)
   j<-j+2 # at each iteration, increase j by 2
- } 
+} 
 ```
 
 
@@ -685,7 +695,7 @@ sd(fhs_data$DBP)     # standard deviation
 
 ```{r}
 calc_sum_squares <- function(a_vector){
-    # this function calculates the the sum of the square of variation
+    # this function calculates the sum of the square of variation
     # same as "sum( (x - mean(x) )^2 )"
     
     # if not a numeric vector, stop
@@ -701,6 +711,7 @@ calc_sum_squares <- function(a_vector){
     vec_ss
 }
 
+# test
 calc_sum_squares(vector1)
 calc_sum_squares(vector3)
 ```
@@ -708,9 +719,10 @@ calc_sum_squares(vector3)
 
 ## data visualization
 
-R comes with some default plotting function, which is sufficient for preliminary data analysis. For publication-ready figures, `ggplot2()` and other libraries are recommended.
+R comes with some default plotting functions, which are sufficient for preliminary data analysis. For publication-ready figures, `ggplot2()` and other libraries are recommended.
 
 ```{r}
+# default function to draw histogram
 hist(fhs_data$DBP) # histogram of the diastolic blood pressure
 hist(fhs_data$SBP) # histogram of the systolic blood pressure
 ```
@@ -726,7 +738,7 @@ hist(scale(fhs_data$SBP))
 library(tidyr)
 library(ggplot2)
 
-fhs_clean = fhs_data[complete.cases(fhs_data),] # subset 'fhs_data', including only complete rows
+fhs_clean <- fhs_data[complete.cases(fhs_data),] # subset 'fhs_data', including only complete rows
 
 fhs_clean %>%
   gather(key=variable, value=value, c(AGE, SBP, DBP, CHOL, FRW)) %>%
